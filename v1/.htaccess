@@ -1,0 +1,24 @@
+# CORS Options
+Header Set Access-Control-Allow-Origin "*"
+
+php_flag display_errors on
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Course
+RewriteRule ^course/all-course$ controller/course.php?mode=all-course [L]
+
+# Registration
+RewriteRule ^account/register-account$ controller/registration.php [L]
+
+#Login
+RewriteRule ^account/login$ controller/login.php [L]
+
+#Accounts Related
+RewriteRule ^account/accounts-related$ controller/accounts_related.php [L]
+
+#Password Reset
+RewriteRule ^account/password-reset/(\d+)$ html/password_reset.php?id=$1 [L]
