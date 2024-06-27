@@ -112,7 +112,7 @@
 					$link = "";
 
 					while ($row = $query_email->fetch(PDO::FETCH_ASSOC)) {
-						$link = "https://apps.project4teen.online/e-grad-api/v1/account/password-reset/" . $row["id"];
+						$link = "https://apps.project4teen.online/e-grad-admin/pages/password_reset?id=".$row["id"]."&is_admin=0";
 					} 
 
 					try {
@@ -128,7 +128,7 @@
 			            $mail->addAddress($emailAddress, str_replace(",","",$emailAddress));
 			        
 			            $mail->Subject = 'E-GradNayan Password Reset';
-			            $mail->Body    = "Please open the link bellow.\n\n".$link."\n\nAfter that you may login using the ff. credentials below\n\nStudent ID: <Your Student ID used in registration>\nPassword: <Student ID>-<Year Graduated>";
+			            $mail->Body    = "Please open the link bellow to change your password.\n\n".$link;
 			        
 			            $mail->send();
 
