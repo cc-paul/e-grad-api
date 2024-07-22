@@ -130,8 +130,11 @@
 			sendResponse(500,false,"There was an issue creating your user account.Please try again");
 		}
 
-		$query_student_number = $writeDB->prepare("SELECT * FROM eg_graduates WHERE studentNumber=:studentNumber AND isActive = 1");
+		$query_student_number = $writeDB->prepare("SELECT * FROM eg_graduates WHERE studentNumber=:studentNumber AND isActive = 1 AND firstName=:firstName AND middleName=:middleName AND lastName=:lastName");
 		$query_student_number->bindParam(':studentNumber',$studentNumber,PDO::PARAM_STR);
+		$query_student_number->bindParam(':firstName',$firstName,PDO::PARAM_STR);
+		$query_student_number->bindParam(':middleName',$middleName,PDO::PARAM_STR);
+		$query_student_number->bindParam(':lastName',$lastName,PDO::PARAM_STR);
 		$query_student_number->execute();
 		$rowCount = $query_student_number->rowCount();
 
