@@ -57,6 +57,7 @@
 		$minSchoolYear      = 1906;
 		$maxSchoolYear      = getCurrentYear();
 		$maxCharString      = 225;
+		$maxStudentLen      = 9;
 		$currentDateAndTime = getCurrentDateAndTime();
 		$isPasswordChanged  = 1;
 
@@ -72,8 +73,8 @@
 			sendResponse(400,false,"Please fill in all required fields");
 		}
 
-		if (strlen($studentNumber) > $maxCharString) {
-			sendResponse(400,false,"Student Number is too long");
+		if (strlen($studentNumber) > $maxStudentLen) {
+			sendResponse(400,false,"Student Number is too long, Must be 9 characters only");
 		}
 
 		if (strlen($firstName) > $maxCharString) {
@@ -104,6 +105,27 @@
 
 		if ($rowCount !== 0) {
 			sendResponse(409,false,"Email address already exist");
+		}
+
+		$query_check_exist_sn = $writeDB->prepare("SELECT * FROM eg_app_registration WHERE studentNumber=:studentNumber");
+		$query_check_exist_sn->bindParam(':studentNumber',$studentNumber,PDO::PARAM_STR);
+		$query_check_exist_sn->execute();
+		$rowCount = $query_check_exist_sn->rowCount();
+
+		if ($rowCount !== 0) {
+			sendResponse(500,false,"Student number already registered.");
+		}
+
+		$query_check_exist = $writeDB->prepare("SELECT * FROM eg_app_registration WHERE studentNumber=:studentNumber AND firstName=:firstName AND middleName=:middleName AND lastName=:lastName");
+		$query_check_exist->bindParam(':studentNumber',$studentNumber,PDO::PARAM_STR);
+		$query_check_exist->bindParam(':firstName',$firstName,PDO::PARAM_STR);
+		$query_check_exist->bindParam(':middleName',$middleName,PDO::PARAM_STR);
+		$query_check_exist->bindParam(':lastName',$lastName,PDO::PARAM_STR);
+		$query_check_exist->execute();
+		$rowCount = $query_check_exist->rowCount();
+
+		if ($rowCount !== 0) {
+			sendResponse(500,false,"Account already exist.");
 		}
 
 		$query = $writeDB->prepare("

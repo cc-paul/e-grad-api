@@ -1,5 +1,4 @@
 <?php
-		
 	class DB {
 		private static $writeDBConnection;
 		private static $readDBConnection;
@@ -28,5 +27,4 @@
 			return self::$readDBConnection;
 		}
 	}
-
 ?>
