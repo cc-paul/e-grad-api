@@ -22,3 +22,6 @@ RewriteRule ^account/accounts-related$ controller/accounts_related.php [L]
 
 #Password Reset
 RewriteRule ^account/password-reset/(\d+)$ html/password_reset.php?id=$1 [L]
+
+#Yearbook Related
+RewriteRule ^yearbook-related$ controller/yearbook_related.php [L]

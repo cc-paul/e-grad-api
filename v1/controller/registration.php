@@ -163,7 +163,6 @@
 		if ($rowCount !== 0) {
 			while ($row = $query_student_number->fetch(PDO::FETCH_ASSOC)) {
 				$approve  = "Approve";
-				$password = $studentNumber ."-". $yearGraduated;
 
 				$query = $writeDB->prepare("UPDATE eg_app_registration SET `status`=:status,`password`=MD5(:password) WHERE id IN (SELECT id FROM eg_app_registration WHERE studentNumber = :studentNumber)");
 				$query->bindParam(':status',$approve,PDO::PARAM_STR);
