@@ -79,6 +79,130 @@
 				sendResponse(201,true,"Courses has been retreived",$returnData,false);
 			}
 
+			if ($mode == "get_awardee") {
+				if (!isset($jsonData->schoolYear)) {
+					sendResponse(400,false,"Incomplete Response");
+				}
+
+				$schoolYear   = $jsonData->schoolYear;
+				$awardeeArray = array();
+
+				$query = $readDB->prepare("
+					SELECT 
+						c.id,
+						a.studentId,
+						a.folderName,
+						a.fileName,
+						CONCAT(c.lastName,', ',c.firstName,' ',IFNULL(c.middleName,'')) AS fullName,
+						b.titleName,
+						d.course
+					FROM
+						eg_gradpics a 
+					INNER JOIN
+						eg_reward b 
+					ON 
+						a.studentId = b.studentId 
+					AND 
+						b.isActive = 1 
+					AND 
+						b.isAwardee = 1
+					INNER JOIN
+						eg_graduates c 
+					ON 
+						a.studentId = c.id
+					INNER JOIN 
+						eg_course d 
+					ON 
+						a.courseId = d.id
+					WHERE
+						a.isActive = 1 
+					AND 
+						a.schoolYear = :schoolYear
+					GROUP BY
+						a.studentId				
+				");
+				$query->bindParam(':schoolYear',$schoolYear,PDO::PARAM_INT);
+				$query->execute();
+
+				while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+					$currentRowData = array(
+						"id"         => $row["id"],
+						"studentId"  => $row["studentId"],
+						"folderName" => $row["folderName"],
+						"fileName"   => $row["fileName"],
+						"fullName"   => $row["fullName"],
+						"titleName"  => $row["titleName"],
+						"course"     => $row["course"]
+					);
+
+					$awardeeArray[] = $currentRowData;
+				}
+
+				$returnData = array();
+				$returnData["rows_returned"] = count($awardeeArray);
+				$returnData["awardee"] = $awardeeArray;
+
+				sendResponse(201,true,"Awardee has been retreived",$returnData,false);
+			}
+
+
+			if ($mode == "get_media") {
+				if (!isset($jsonData->schoolYear)) {
+					sendResponse(400,false,"Incomplete Response");
+				}
+
+				$schoolYear   = $jsonData->schoolYear;
+				$mediaArray = array();
+
+				$query = $readDB->prepare("
+					SELECT 
+						a.* 
+					FROM (
+						SELECT 
+							a.schoolYear,
+							a.fileName,
+							a.description,
+							'pic' AS type
+						FROM
+							eg_grad_gallery a 
+						WHERE
+							a.isActive = 1
+						UNION ALL 
+						SELECT 
+							a.folderName,
+							CONCAT(a.fileName,'.mp4') AS fileName,
+							a.description,
+							'vid' AS type
+						FROM
+							eg_videos a 
+						WHERE
+							a.isActive = 1
+					) a 
+					WHERE
+						a.schoolYear = :schoolYear
+				");
+				$query->bindParam(':schoolYear',$schoolYear,PDO::PARAM_INT);
+				$query->execute();
+
+				while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+					$currentRowData = array(
+						"schoolYear"  => $row["schoolYear"],
+						"fileName"    => $row["fileName"],
+						"description" => strlen($row["description"]) != 0 ? $row["description"] : '',
+						"type"        => $row["type"]
+					);
+
+					$mediaArray[] = $currentRowData;
+				}
+
+				$returnData = array();
+				$returnData["rows_returned"] = count($mediaArray);
+				$returnData["media"] = $mediaArray;
+
+				sendResponse(201,true,"Media has been retreived",$returnData,false);
+			}
+
+
 			if ($mode == "get_grad_pics") {
 				if (
 					!isset($jsonData->courseId) ||
