@@ -73,8 +73,8 @@
 			sendResponse(400,false,"Please fill in all required fields");
 		}
 
-		if (strlen($studentNumber) > $maxStudentLen) {
-			sendResponse(400,false,"Student Number is too long, Must be 9 characters only");
+		if (strlen($studentNumber) != $maxStudentLen) {
+			sendResponse(400,false,"Student Number must be 9 characters only");
 		}
 
 		if (strlen($firstName) > $maxCharString) {

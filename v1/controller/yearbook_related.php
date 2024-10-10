@@ -222,7 +222,9 @@
 			            	b.id AS studentId,
 							CONCAT(b.lastName,', ',b.firstName,' ',IFNULL(b.middleName,'')) AS fullName,
 							fileName AS gradPicFileName,
-							a.folderName
+							a.folderName,
+							b.studentNumber,
+							(SELECT COUNT(*) FROM eg_reward WHERE studentId = b.id AND isActive = 1) AS totalAchievement
 						FROM
 							eg_gradpics a 
 						INNER JOIN		
@@ -236,19 +238,27 @@
 						AND
 							a.schoolYear = :schoolYear 
 						WHERE
-							b.lastName LIKE :search
+							b.lastName LIKE :search1
+						OR
+							b.firstName LIKE :search2
+						OR
+							IFNULL(b.middleName,'') LIKE :search3
 						ORDER BY
 							b.lastName ASC
 			        ");
 			        $queryGetAllGrad->bindParam(':schoolYear', $schoolYear, PDO::PARAM_STR);
-			        $queryGetAllGrad->bindParam(':search', $search, PDO::PARAM_STR);
+			        $queryGetAllGrad->bindParam(':search1', $search, PDO::PARAM_STR);
+			        $queryGetAllGrad->bindParam(':search2', $search, PDO::PARAM_STR);
+			        $queryGetAllGrad->bindParam(':search3', $search, PDO::PARAM_STR);
 			    } else {
 			        $queryGetAllGrad = $writeDB->prepare("
 			            SELECT 
 			            	b.id AS studentId,
 							CONCAT(b.lastName,', ',b.firstName,' ',IFNULL(b.middleName,'')) AS fullName,
 							fileName AS gradPicFileName,
-							a.folderName
+							a.folderName,
+							b.studentNumber,
+							(SELECT COUNT(*) FROM eg_reward WHERE studentId = b.id AND isActive = 1) AS totalAchievement
 						FROM
 							eg_gradpics a 
 						INNER JOIN		
@@ -285,7 +295,9 @@
 				        "studentId"       => $row["studentId"],
 				        "fullName"        => $row["fullName"],
 				        "gradPicFileName" => $row["gradPicFileName"],
-				        "folderName" => $row["folderName"]
+				        "folderName" => $row["folderName"],
+				        "studentNumber" => $row["studentNumber"],
+				        "totalAchievement" => $row["totalAchievement"]
 				    );
 
 				    $lastNameFirstLetter = strtoupper($row["fullName"][0]);
@@ -306,9 +318,93 @@
 			    sendResponse(200, true, "Graduates have been retrieved", $returnData, false);
 			}
 
+			if ($mode == "get_achievement") {
+				if (
+					!isset($jsonData->studentNumber)
+				) {
+					sendResponse(400,false,"Incomplete Response");
+				}
+
+				$studentNumber = $jsonData->studentNumber;
+				$achievementArray = array();
+
+				$queryGetAllAch = $writeDB->prepare("
+		            SELECT
+						a.studentNumber,
+						CONCAT(a.lastName,', ',a.firstName,' ', IFNULL(a.middleName,'')) AS fullName,
+						b.course,
+						a.id
+					FROM
+						eg_graduates a
+					INNER JOIN
+						eg_course b 
+					ON 
+						a.courseId = b.id
+					WHERE
+						a.studentNumber = :studentNumber
+		        ");
+		        $queryGetAllAch->bindParam(':studentNumber', $studentNumber, PDO::PARAM_STR);
+				$queryGetAllAch->execute();
+
+				while ($row = $queryGetAllAch->fetch(PDO::FETCH_ASSOC)) {
+					$currentRowData = array(
+						"studentNumber" => $row["studentNumber"],
+						"fullName"      => $row["fullName"],
+						"course"        => $row["course"],
+						"id"            => $row["id"],
+						"achievement"   => getAchievement($row["id"],$writeDB)
+					);
+
+					$achievementArray[] = $currentRowData;
+				}
+
+				$returnData = array();
+				$returnData["rows_returned"] = count($achievementArray);
+				$returnData["achievement"] = $achievementArray;
+
+				sendResponse(201,true,"Achievement has been retreived",$returnData,false);
+			}
+
 			sendResponse(400,false,"Mode not found");
 		}
 	} else {
 		sendResponse(404,false,"Endpoint not found");
+	}
+
+
+	/* Child Queries */
+	function getAchievement($studentId,$writeDB) {
+		$achievementArray = array();
+
+		$queryGetAllAch = $writeDB->prepare("
+            SELECT 
+            	a.id,
+			    a.studentId,
+			    a.titleName,
+			    DATE_FORMAT(a.dateReceived, '%m/%d/%Y') AS dateReceived,
+			    a.remarks,
+			    a.isAwardee
+            FROM
+            	eg_reward a 
+            WHERE
+            	a.studentId = :studentId
+        ");
+        $queryGetAllAch->bindParam(':studentId', $studentId, PDO::PARAM_INT);
+		$queryGetAllAch->execute();
+
+		while ($row = $queryGetAllAch->fetch(PDO::FETCH_ASSOC)) {
+			$currentRowData = array(
+				"id"             => $row["id"],
+				"studentId"      => $row["studentId"],
+				"titleName"      => $row["titleName"],
+				"dateReceived"   => $row["dateReceived"],
+				"remarks"        => $row["remarks"],
+				"isAwardee"      => $row["isAwardee"]
+			);
+
+			$achievementArray[] = $currentRowData;
+		}
+
+		return $achievementArray;
 	}
 ?>
