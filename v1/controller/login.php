@@ -37,6 +37,7 @@
 		$password      = $jsonData->password;
 		$STR_APPROVE   = "Approve";
 		$STR_BAN       = "Ban";
+		$STR_LOCK      = "Lock";
 
 		if (
 			$studentNumber == "" ||
@@ -82,6 +83,8 @@
 					sendResponse(201,true,"Login Account has been retreived",$returnData,false);
 				} else if ($status == $STR_BAN) {
 					sendResponse(405,false,"Unable to login. Account has been disabled");
+				} else if ($status == $STR_LOCK) {
+					sendResponse(405,false,"Unable to login. Account has been locked for previous school year");
 				} else {
 					sendResponse(405,false,"Unable to login. Account has not been verified");
 				}
