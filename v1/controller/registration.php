@@ -187,7 +187,7 @@
 			            $mail->setFrom('digitalyearbookcvsuccc.noreply@gmail.com', "E-GradNayan");
 			            $mail->addAddress($emailAddress, str_replace(",","",$emailAddress));
 			        
-			            $mail->Subject = 'E-GradNayan Account Approval';
+			            $mail->Subject = 'CVSU Account Approval';
 			            $mail->Body    = "Congratulations! Your account has been approved. You may now login your registered account";
 			        
 			            $mail->send();
