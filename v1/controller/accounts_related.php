@@ -124,10 +124,10 @@
 			            $mail->SMTPSecure = 'tls';               
 			            $mail->Port = 587;
 			        
-			            $mail->setFrom('digitalyearbookcvsuccc.noreply@gmail.com', "E-GradNayan");
+			            $mail->setFrom('digitalyearbookcvsuccc.noreply@gmail.com', "CVSU Yearbook");
 			            $mail->addAddress($emailAddress, str_replace(",","",$emailAddress));
 			        
-			            $mail->Subject = 'E-GradNayan Password Reset';
+			            $mail->Subject = 'CVSU Yearbook Password Reset';
 			            $mail->Body    = "Please open the link bellow to change your password.\n\n".$link;
 			        
 			            $mail->send();

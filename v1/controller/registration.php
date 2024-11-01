@@ -184,10 +184,10 @@
 			            $mail->SMTPSecure = 'tls';               
 			            $mail->Port = 587;
 			        
-			            $mail->setFrom('digitalyearbookcvsuccc.noreply@gmail.com', "E-GradNayan");
+			            $mail->setFrom('digitalyearbookcvsuccc.noreply@gmail.com', "CVSU Yearbook");
 			            $mail->addAddress($emailAddress, str_replace(",","",$emailAddress));
 			        
-			            $mail->Subject = 'CVSU Account Approval';
+			            $mail->Subject = 'CVSU Yearbook Account Approval';
 			            $mail->Body    = "Congratulations! Your account has been approved. You may now login your registered account";
 			        
 			            $mail->send();
