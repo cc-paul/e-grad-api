@@ -162,17 +162,19 @@
 							a.schoolYear,
 							a.fileName,
 							a.description,
-							'pic' AS type
+							'pic' AS type,
+							a.isCoverPhoto
 						FROM
 							eg_grad_gallery a 
 						WHERE
-							a.isActive = 1
+							a.isActive = 1 
 						UNION ALL 
 						SELECT 
 							a.folderName,
 							CONCAT(a.fileName,'.mp4') AS fileName,
 							a.description,
-							'vid' AS type
+							'vid' AS type,
+							0 AS isCoverPhoto
 						FROM
 							eg_videos a 
 						WHERE
@@ -186,10 +188,11 @@
 
 				while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
 					$currentRowData = array(
-						"schoolYear"  => $row["schoolYear"],
-						"fileName"    => $row["fileName"],
-						"description" => strlen($row["description"]) != 0 ? $row["description"] : '',
-						"type"        => $row["type"]
+						"schoolYear"   => $row["schoolYear"],
+						"fileName"     => $row["fileName"],
+						"description"  => strlen($row["description"]) != 0 ? $row["description"] : '',
+						"type"         => $row["type"],
+						"isCoverPhoto" => $row["isCoverPhoto"]
 					);
 
 					$mediaArray[] = $currentRowData;
