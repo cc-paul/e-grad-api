@@ -112,7 +112,7 @@
 					$link = "";
 
 					while ($row = $query_email->fetch(PDO::FETCH_ASSOC)) {
-						$link = "https://apps.project4teen.online/e-grad-admin/pages/password_reset?id=".$row["id"]."&is_admin=0";
+						$link = "https://apps.project4teen.online/cvsu-admin/pages/password_reset?id=".$row["id"]."&is_admin=0";
 					} 
 
 					try {
