@@ -344,7 +344,7 @@
 					ON 
 						a.courseId = b.id
 					WHERE
-						a.studentNumber = :studentNumber
+						a.studentNumber = :studentNumber 
 		        ");
 		        $queryGetAllAch->bindParam(':studentNumber', $studentNumber, PDO::PARAM_STR);
 				$queryGetAllAch->execute();
@@ -391,6 +391,8 @@
             	eg_reward a 
             WHERE
             	a.studentId = :studentId
+			AND 
+				a.isActive = 1
         ");
         $queryGetAllAch->bindParam(':studentId', $studentId, PDO::PARAM_INT);
 		$queryGetAllAch->execute();
